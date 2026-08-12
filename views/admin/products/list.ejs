@@ -1,0 +1,54 @@
+<div class="admin-container">
+  <div class="admin-header">
+    <h1>Produits (<%= products.length %>)</h1>
+    <a href="/admin/products/nouveau" class="btn-primary">+ Ajouter un parfum</a>
+  </div>
+
+ <div class="admin-table-wrapper">
+  
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Nom</th>
+        <th>Marque</th>
+        <th>Genre</th>
+        <th>Variantes</th>
+        <th>Statut</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% products.forEach(function(product) { %>
+        <tr>
+          <td>
+            <% if (product.image_principale) { %>
+              <img src="<%= product.image_principale %>" alt="<%= product.nom %>" class="thumb">
+            <% } else { %>
+              <span>—</span>
+            <% } %>
+          </td>
+          <td><%= product.nom %></td>
+          <td><%= product.Brand ? product.Brand.nom : '—' %></td>
+          <td><%= product.genre %></td>
+          <td>
+            <% if (product.variants && product.variants.length > 0) { %>
+              <% product.variants.forEach(function(v) { %>
+                <span class="badge"><%= v.contenance_ml %>ml - <%= v.prix %> FCFA</span>
+              <% }); %>
+            <% } else { %>
+              <span>Aucune</span>
+            <% } %>
+          </td>
+          <td><%= product.actif ? 'Actif' : 'Inactif' %></td>
+          <td class="actions">
+            <a href="/admin/products/<%= product.id %>/modifier">Modifier</a>
+            <form action="/admin/products/<%= product.id %>/supprimer" method="POST" onsubmit="return confirm('Supprimer ce parfum ?');" style="display:inline;">
+              <button type="submit" class="btn-danger">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,65 @@
+<div class="admin-container">
+  <h1>Tableau de bord</h1>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-label">Commandes totales</span>
+      <span class="stat-value"><%= stats.totalOrders %></span>
+    </div>
+    <div class="stat-card stat-warning">
+      <span class="stat-label">En attente</span>
+      <span class="stat-value"><%= stats.pendingOrders %></span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Ventes totales</span>
+      <span class="stat-value"><%= parseFloat(stats.totalSales).toLocaleString('fr-FR') %> FCFA</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Ventes ce mois-ci</span>
+      <span class="stat-value"><%= parseFloat(stats.monthSales).toLocaleString('fr-FR') %> FCFA</span>
+    </div>
+  </div>
+
+  <nav class="admin-nav">
+    <a href="/admin/products">Gérer les produits</a>
+    <a href="/admin/orders">Gérer les commandes</a>
+  </nav>
+
+  <div class="dashboard-columns">
+
+    <div class="dashboard-col">
+      <h2>Dernières commandes</h2>
+      <% if (recentOrders.length === 0) { %>
+        <p>Aucune commande pour l'instant.</p>
+      <% } else { %>
+        <ul class="simple-list">
+          <% recentOrders.forEach(function(order) { %>
+            <li>
+              <a href="/admin/orders/<%= order.id %>">
+                <%= order.numero_commande %> — <%= parseFloat(order.total).toLocaleString('fr-FR') %> FCFA
+                <span class="status-badge status-<%= order.statut %>"><%= order.statut %></span>
+              </a>
+            </li>
+          <% }); %>
+        </ul>
+      <% } %>
+    </div>
+
+    <div class="dashboard-col">
+<h2><i class="fa-solid fa-triangle-exclamation"></i> Stock bas (&lt; 5 unités)</h2>      <% if (lowStockVariants.length === 0) { %>
+        <p>Tout est en stock suffisant </p>
+      <% } else { %>
+        <ul class="simple-list">
+          <% lowStockVariants.forEach(function(v) { %>
+            <li>
+              <a href="/admin/products/<%= v.Product.id %>/modifier">
+                <%= v.Product.nom %> (<%= v.contenance_ml %>ml) — <strong><%= v.stock %></strong> restant(s)
+              </a>
+            </li>
+          <% }); %>
+        </ul>
+      <% } %>
+    </div>
+
+  </div>
+</div>

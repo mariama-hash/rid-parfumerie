@@ -1,0 +1,61 @@
+<div class="account-container">
+  <a href="/mon-compte/commandes" class="back-link"><i class="fa-solid fa-arrow-left"></i> Mes commandes</a>
+
+  <h1>Commande <%= order.numero_commande %></h1>
+
+  <div class="order-status-banner status-banner-<%= order.statut %>">
+    <% const statusInfo = {
+      en_attente: { icon: 'clock', label: 'En attente de confirmation' },
+      confirmee: { icon: 'circle-check', label: 'Commande confirmée' },
+      expediee: { icon: 'truck', label: 'En cours de livraison' },
+      livree: { icon: 'box-open', label: 'Livrée' },
+      annulee: { icon: 'circle-xmark', label: 'Annulée' },
+    }[order.statut]; %>
+    <i class="fa-solid fa-<%= statusInfo.icon %>"></i>
+    <span><%= statusInfo.label %></span>
+  </div>
+
+  <div class="order-detail-layout">
+
+    <div class="order-detail-main">
+      <section class="detail-block">
+        <h2>Articles</h2>
+        <% order.items.forEach(function(item) { %>
+          <div class="order-item-row">
+            <% if (item.ProductVariant.Product.image_principale) { %>
+              <img src="<%= item.ProductVariant.Product.image_principale %>" alt="<%= item.ProductVariant.Product.nom %>" class="cart-thumb">
+            <% } %>
+            <div class="order-item-info">
+              <strong><%= item.ProductVariant.Product.nom %></strong>
+              <span><%= item.ProductVariant.contenance_ml %>ml × <%= item.quantite %></span>
+            </div>
+            <span class="order-item-price"><%= (parseFloat(item.prix_unitaire) * item.quantite).toLocaleString('fr-FR') %> FCFA</span>
+          </div>
+        <% }); %>
+        <p class="order-total-line"><strong>Total : <%= parseFloat(order.total).toLocaleString('fr-FR') %> FCFA</strong></p>
+      </section>
+
+      <section class="detail-block">
+        <h2>Livraison</h2>
+        <p><%= order.adresse_livraison %>, <%= order.ville_livraison %></p>
+        <p>Contact : <%= order.telephone_contact %></p>
+        <% if (order.notes) { %><p><em>Note : <%= order.notes %></em></p><% } %>
+      </section>
+    </div>
+
+    <div class="order-detail-sidebar">
+      <section class="detail-block">
+        <h2>Paiement</h2>
+        <p><strong>Mode :</strong> <%= order.Payment.mode %></p>
+        <p><strong>Statut du paiement :</strong> <span class="payment-status-badge payment-<%= order.Payment.statut %>"><%= order.Payment.statut %></span></p>
+        <% if (order.Payment.statut === 'refuse') { %>
+          <p class="payment-refused-note">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Ton paiement n'a pas pu être validé. Contacte-nous pour régulariser ta commande.
+          </p>
+        <% } %>
+      </section>
+    </div>
+
+  </div>
+</div>

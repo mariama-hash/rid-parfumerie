@@ -1,0 +1,26 @@
+<div class="account-container">
+  <h1>Mes commandes</h1>
+
+  <% if (orders.length === 0) { %>
+    <p class="empty-cart">Tu n'as pas encore passé de commande.</p>
+    <a href="/produits" class="btn-primary">Découvrir nos parfums</a>
+  <% } else { %>
+
+    <div class="order-list">
+      <% orders.forEach(function(order) { %>
+        <a href="/mon-compte/commandes/<%= order.id %>" class="order-card">
+          <div class="order-card-main">
+            <span class="order-number"><%= order.numero_commande %></span>
+            <span class="order-date"><%= new Date(order.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) %></span>
+          </div>
+          <div class="order-card-side">
+            <span class="order-total"><%= parseFloat(order.total).toLocaleString('fr-FR') %> FCFA</span>
+            <span class="status-badge status-<%= order.statut %>"><%= order.statut.replace('_', ' ') %></span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+        </a>
+      <% }); %>
+    </div>
+
+  <% } %>
+</div>

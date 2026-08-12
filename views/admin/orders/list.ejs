@@ -1,0 +1,52 @@
+<div class="admin-container">
+  <div class="admin-header">
+    <h1>Commandes</h1>
+  </div>
+
+  <div class="status-filters">
+    <a href="/admin/orders" class="<%= !currentStatut ? 'active' : '' %>">Toutes</a>
+    <a href="/admin/orders?statut=en_attente" class="<%= currentStatut === 'en_attente' ? 'active' : '' %>">En attente</a>
+    <a href="/admin/orders?statut=confirmee" class="<%= currentStatut === 'confirmee' ? 'active' : '' %>">Confirmées</a>
+    <a href="/admin/orders?statut=expediee" class="<%= currentStatut === 'expediee' ? 'active' : '' %>">Expédiées</a>
+    <a href="/admin/orders?statut=livree" class="<%= currentStatut === 'livree' ? 'active' : '' %>">Livrées</a>
+    <a href="/admin/orders?statut=annulee" class="<%= currentStatut === 'annulee' ? 'active' : '' %>">Annulées</a>
+  </div>
+
+  <div class="admin-table-wrapper">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>N° commande</th>
+        <th>Cliente</th>
+        <th>Total</th>
+        <th>Paiement</th>
+        <th>Statut</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% orders.forEach(function(order) { %>
+        <tr>
+          <td><%= order.numero_commande %></td>
+          <td><%= order.User.prenom %> <%= order.User.nom %></td>
+          <td><%= parseFloat(order.total).toLocaleString('fr-FR') %> FCFA</td>
+          <td>
+            <span class="payment-mode-badge"><%= order.Payment.mode %></span>
+            <span class="payment-status-badge payment-<%= order.Payment.statut %>"><%= order.Payment.statut %></span>
+          </td>
+          <td><span class="status-badge status-<%= order.statut %>"><%= order.statut %></span></td>
+          <td><%= new Date(order.createdAt).toLocaleDateString('fr-FR') %></td>
+          <td>
+            <a href="/admin/orders/<%= order.id %>">Voir détail</a>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+  <% if (orders.length === 0) { %>
+    <p>Aucune commande trouvée.</p>
+  <% } %>
+</div>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rid_Parfumerie</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="/" class="logo-img">
+                <img src="/images/logo.webp" alt="Rid_Parfumerie" loading="lazy">
+                <span class="logo-wordmark">
+                    <span>Parfumerie</span>
+                    Rid
+                </span>
+            </a>
+
+            <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <nav class="main-nav" id="mainNav">
+                <a href="/produits">Nos parfums</a>
+
+                <% if (user) { %>
+                    <a href="/panier" class="nav-cart-link">
+                        <i class="fa-solid fa-cart-shopping"></i> <span class="nav-mobile-label">Panier</span>
+                        <% if (cartCount> 0) { %>
+                            <span class="cart-badge">
+                                <%= cartCount %>
+                            </span>
+                            <% } %>
+                    </a>
+
+                    <% if (user.role==='admin' ) { %>
+                        <a href="/admin/dashboard"><i class="fa-solid fa-gauge"></i> Admin</a>
+                        <a href="/admin/clients"><i class="fa-solid fa-users"></i> Clients</a>
+                        <% } %>
+
+                            <div class="nav-account-menu" id="navAccountMenu">
+                                <button type="button" class="nav-account-toggle" id="navAccountToggle">
+                                    <i class="fa-solid fa-user"></i>
+                                    <%= user.prenom %>
+                                        <i class="fa-solid fa-chevron-down nav-account-arrow"></i>
+                                </button>
+                                <div class="nav-account-dropdown" id="navAccountDropdown">
+                                    <a href="/mon-compte/commandes"><i class="fa-solid fa-receipt"></i> Mes
+                                        commandes</a>
+                                    <a href="/mon-compte/profil"><i class="fa-solid fa-user-gear"></i> Mon profil</a>
+                                    <form action="/deconnexion" method="POST" class="inline-form">
+                                        <button type="submit" class="link-btn nav-account-logout"><i
+                                                class="fa-solid fa-right-from-bracket"></i> Déconnexion</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <% } else { %>
+                                <a href="/connexion">Connexion</a>
+                                <a href="/inscription" class="nav-cta">Inscription</a>
+                                <% } %>
+            </nav>
+        </div>
+        <div class="pyramid-divider"></div>
+    </header>
+
+    <main class="site-main">
+        <% if (success_msg && success_msg.length> 0) { %>
+            <p class="alert alert-success"><i class="fa-solid fa-circle-check"></i>
+                <%= success_msg[0] %>
+            </p>
+            <% } %>
+                <% if (error_msg && error_msg.length> 0) { %>
+                    <p class="alert alert-error"><i class="fa-solid fa-circle-exclamation"></i>
+                        <%= error_msg[0] %>
+                    </p>
+                    <% } %>
+
+                        <%- body %>
+    </main>
+
+    <footer class="site-footer-full">
+        <div class="pyramid-divider"></div>
+        <div class="footer-grid">
+
+            <div class="footer-col footer-brand-col">
+                <h3 class="footer-brand-name">Rid_Parfumerie</h3>
+                <span class="footer-tagline">Fragrances authentiques · Lomé, Togo</span>
+
+                <h4>À propos</h4>
+                <p class="footer-about">
+                    Rid_Parfumerie propose une sélection de parfums authentiques pour toutes et tous,
+                    livrés à Lomé avec paiement Flooz, T-Money ou à la réception.
+                </p>
+
+                <% if (contact.whatsapp) { %>
+                    <a href="https://wa.me/<%= contact.whatsapp %>" target="_blank" rel="noopener"
+                        class="footer-whatsapp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <%= contact.phoneDisplay %>
+                    </a>
+                    <% } %>
+                        <span class="footer-location"><i class="fa-solid fa-location-dot"></i>
+                            <%= contact.address %>
+                        </span>
+            </div>
+
+            <div class="footer-col">
+                <h4>Boutique</h4>
+                <a href="/produits">Toute la boutique</a>
+                <a href="/produits?sort=nom">Nouveautés</a>
+                <a href="/panier">Mon panier</a>
+            </div>
+
+            <div class="footer-col">
+                <h4>Mon compte</h4>
+                <% if (user) { %>
+                    <a href="/mon-compte/commandes">Mes commandes</a>
+                    <% } else { %>
+                        <a href="/connexion">Connexion</a>
+                        <a href="/inscription">Créer un compte</a>
+                        <% } %>
+            </div>
+
+            <div class="footer-col">
+                <h4>Informations légales</h4>
+                <a href="/mentions-legales">Mentions légales</a>
+                <a href="/politique-confidentialite">Politique de confidentialité</a>
+                <a href="/conditions-generales-vente">Conditions générales de vente</a>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-social">
+                <% if (social.tiktok) { %><a href="<%= social.tiktok %>" target="_blank" rel="noopener"><i
+                            class="fa-brands fa-tiktok"></i></a>
+                    <% } %>
+                        <% if (social.instagram) { %><a href="<%= social.instagram %>" target="_blank" rel="noopener"><i
+                                    class="fa-brands fa-instagram"></i></a>
+                            <% } %>
+                                <% if (social.linkedin) { %><a href="<%= social.linkedin %>" target="_blank"
+                                        rel="noopener"><i class="fa-brands fa-linkedin"></i></a>
+                                    <% } %>
+            </div>
+            <p>© <%= new Date().getFullYear() %> Rid_Parfumerie — Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script>
+        const navToggle = document.getElementById('navToggle');
+        const mainNav = document.getElementById('mainNav');
+        navToggle.addEventListener('click', () => {
+            const isOpen = mainNav.classList.toggle('nav-open');
+            navToggle.setAttribute('aria-expanded', isOpen);
+            navToggle.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+        });
+
+
+        (function () {
+            const accountToggle = document.getElementById('navAccountToggle');
+            const accountMenu = document.getElementById('navAccountMenu');
+            if (!accountToggle || !accountMenu) return;
+
+            accountToggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                accountMenu.classList.toggle('nav-account-open');
+            });
+
+            // Ferme le sous-menu si on clique ailleurs
+            document.addEventListener('click', function (e) {
+                if (!accountMenu.contains(e.target)) {
+                    accountMenu.classList.remove('nav-account-open');
+                }
+            });
+        })();
+
+
+        const revealEls = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        revealEls.forEach((el) => observer.observe(el));
+    </script>
+</body>
+
+</html>

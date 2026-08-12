@@ -1,0 +1,59 @@
+<div class="account-container">
+  <h1>Mon profil</h1>
+
+  <form action="/mon-compte/profil" method="POST" class="admin-form">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="nom">Nom</label>
+        <input type="text" id="nom" name="nom" value="<%= profileUser.nom %>" required>
+      </div>
+      <div class="form-group">
+        <label for="prenom">Prénom</label>
+        <input type="text" id="prenom" name="prenom" value="<%= profileUser.prenom %>" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <% if (profileUser.role === 'admin') { %>
+        <input type="email" id="email" name="email" value="<%= profileUser.email %>" required>
+      <% } else { %>
+        <input type="email" value="<%= profileUser.email %>" disabled>
+        <small>L'email ne peut pas être modifié depuis ton espace. Contacte-nous si besoin.</small>
+      <% } %>
+    </div>
+
+    <div class="form-group">
+      <label for="telephone">Téléphone</label>
+      <input type="tel" id="telephone" name="telephone" value="<%= profileUser.telephone || '' %>">
+    </div>
+
+    <div class="form-group">
+      <label for="adresse">Adresse</label>
+      <input type="text" id="adresse" name="adresse" value="<%= profileUser.adresse || '' %>">
+    </div>
+
+    <div class="form-group">
+      <label for="ville">Ville</label>
+      <input type="text" id="ville" name="ville" value="<%= profileUser.ville || '' %>">
+    </div>
+
+    <hr>
+    <h3>Changer le mot de passe</h3>
+    <p><small>Laisse ces champs vides si tu ne veux pas changer ton mot de passe.</small></p>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="newPassword">Nouveau mot de passe</label>
+        <input type="password" id="newPassword" name="newPassword">
+      </div>
+      <div class="form-group">
+        <label for="confirmNewPassword">Confirmer le nouveau mot de passe</label>
+        <input type="password" id="confirmNewPassword" name="confirmNewPassword">
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary" style="margin-top: 16px;">Enregistrer les modifications</button>
+  </form>
+</div>

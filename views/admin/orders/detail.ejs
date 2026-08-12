@@ -1,0 +1,123 @@
+<div class="admin-container">
+  <a href="/admin/orders">← Retour aux commandes</a>
+
+  <h1>Commande <%= order.numero_commande %></h1>
+
+  <div class="order-detail-layout">
+
+    <div class="order-detail-main">
+
+      <section class="detail-block">
+        <h2>Cliente</h2>
+        <p><%= order.User.prenom %> <%= order.User.nom %></p>
+        <p><%= order.User.email %></p>
+        <p><%= order.User.telephone %></p>
+      </section>
+
+      <section class="detail-block">
+        <h2>Livraison</h2>
+        <p><%= order.adresse_livraison %>, <%= order.ville_livraison %></p>
+        <p>Contact : <%= order.telephone_contact %></p>
+        <% if (order.notes) { %><p><em>Note : <%= order.notes %></em></p><% } %>
+      </section>
+
+      <section class="detail-block">
+        <h2>Articles</h2>
+        <table class="admin-table">
+          <thead>
+            <tr><th>Produit</th><th>Contenance</th><th>Qté</th><th>Prix unitaire</th><th>Sous-total</th></tr>
+          </thead>
+          <tbody>
+            <% order.items.forEach(function(item) { %>
+              <tr>
+                <td><%= item.ProductVariant.Product.nom %></td>
+                <td><%= item.ProductVariant.contenance_ml %>ml</td>
+                <td><%= item.quantite %></td>
+                <td><%= parseFloat(item.prix_unitaire).toLocaleString('fr-FR') %> FCFA</td>
+                <td><%= (parseFloat(item.prix_unitaire) * item.quantite).toLocaleString('fr-FR') %> FCFA</td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+        <p class="order-total-line"><strong>Total : <%= parseFloat(order.total).toLocaleString('fr-FR') %> FCFA</strong></p>
+      </section>
+
+    </div>
+
+    <div class="order-detail-sidebar">
+
+      <section class="detail-block">
+        <h2>Statut de la commande</h2>
+        <form action="/admin/orders/<%= order.id %>/statut" method="POST">
+          <select name="statut">
+            <option value="en_attente" <%= order.statut === 'en_attente' ? 'selected' : '' %>>En attente</option>
+            <option value="confirmee" <%= order.statut === 'confirmee' ? 'selected' : '' %>>Confirmée</option>
+            <option value="expediee" <%= order.statut === 'expediee' ? 'selected' : '' %>>Expédiée</option>
+            <option value="livree" <%= order.statut === 'livree' ? 'selected' : '' %>>Livrée</option>
+            <option value="annulee" <%= order.statut === 'annulee' ? 'selected' : '' %>>Annulée</option>
+          </select>
+          <button type="submit" class="btn-primary">Mettre à jour</button>
+        </form>
+      </section>
+
+      <section class="detail-block">
+        <h2>Paiement</h2>
+        <p><strong>Mode :</strong> <%= order.Payment.mode %></p>
+        <p><strong>Statut :</strong> <span class="payment-status-badge payment-<%= order.Payment.statut %>"><%= order.Payment.statut %></span></p>
+
+        <% if (order.Payment.numero_expediteur) { %>
+          <p><strong>Numéro expéditeur :</strong> <%= order.Payment.numero_expediteur %></p>
+        <% } %>
+
+        <% if (order.Payment.reference_transaction) { %>
+          <p><strong>Référence transaction :</strong> <%= order.Payment.reference_transaction %></p>
+        <% } %>
+
+        <% if (order.Payment.mode !== 'livraison') { %>
+          <% if (order.Payment.montant_recu !== null && parseFloat(order.Payment.montant_recu) !== parseFloat(order.total)) { %>
+            <div class="alert alert-error">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              Montant reçu (<%= parseFloat(order.Payment.montant_recu).toLocaleString('fr-FR') %> FCFA) différent du total commande (<%= parseFloat(order.total).toLocaleString('fr-FR') %> FCFA) !
+            </div>
+          <% } else if (order.Payment.montant_recu !== null) { %>
+            <div class="alert alert-success">
+              <i class="fa-solid fa-circle-check"></i> Montant reçu conforme.
+            </div>
+          <% } %>
+
+          <form action="/admin/orders/<%= order.id %>/montant" method="POST" class="montant-form">
+            <label for="montant_recu">Montant vu sur la capture (FCFA)</label>
+            <div class="montant-input-row">
+              <input type="number" id="montant_recu" name="montant_recu" step="0.01" value="<%= order.Payment.montant_recu || '' %>" placeholder="Ex: 20000">
+              <button type="submit" class="btn-secondary">Vérifier</button>
+            </div>
+          </form>
+        <% } %>
+
+        <% if (order.Payment.capture_ecran) { %>
+          <p><strong>Preuve de paiement :</strong></p>
+          <a href="<%= order.Payment.capture_ecran %>" target="_blank">
+            <img src="<%= order.Payment.capture_ecran %>" alt="Preuve de paiement" class="payment-proof">
+          </a>
+        <% } %>
+
+        <% if (order.Payment.mode !== 'livraison' && order.Payment.statut === 'en_attente') { %>
+          <div class="payment-actions">
+            <form action="/admin/orders/<%= order.id %>/paiement" method="POST" style="display:inline;">
+              <input type="hidden" name="statut" value="valide">
+<button type="submit" class="btn-success"><i class="fa-solid fa-check"></i> Valider le paiement</button>            </form>
+            <form action="/admin/orders/<%= order.id %>/paiement" method="POST" style="display:inline;" onsubmit="return confirm('Refuser ce paiement ?');">
+              <input type="hidden" name="statut" value="refuse">
+<button type="submit" class="btn-danger"><i class="fa-solid fa-xmark"></i> Refuser</button>            </form>
+          </div>
+        <% } %>
+
+        <% if (order.Payment.valide_le) { %>
+          <p><small>Traité le <%= new Date(order.Payment.valide_le).toLocaleString('fr-FR') %></small></p>
+        <% } %>
+      </section>
+
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,189 @@
+<div class="admin-container">
+    <h1>
+        <%= title %>
+    </h1>
+
+    <% if (errors.length> 0) { %>
+        <div class="alert alert-error">
+            <ul>
+                <% errors.forEach(function(error) { %>
+                    <li>
+                        <%= error.msg %>
+                    </li>
+                    <% }); %>
+            </ul>
+        </div>
+        <% } %>
+
+            <form action="<%= product ? '/admin/products/' + product.id + '/modifier' : '/admin/products/nouveau' %>"
+                method="POST" enctype="multipart/form-data" class="admin-form" id="productForm">
+
+                <details class="admin-form-section" open>
+                    <summary class="admin-form-section-toggle">
+                        <i class="fa-solid fa-circle-info"></i> Informations générales
+                    </summary>
+                    <div class="admin-form-section-body">
+
+                        <div class="form-group">
+                            <label for="nom">Nom du parfum</label>
+                            <input type="text" id="nom" name="nom" value="<%= product ? product.nom : '' %>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="brandNom">Marque</label>
+                            <input type="text" id="brandNom" name="brandNom"
+                                value="<%= product && product.Brand ? product.Brand.nom : '' %>"
+                                placeholder="Ex: Dior, Chanel...">
+                            <small>Tape le nom de la marque — elle sera créée automatiquement si elle n'existe pas
+                                encore.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="genre">Genre</label>
+                            <select id="genre" name="genre" required>
+                                <option value="">-- Choisir --</option>
+                                <option value="Homme" <%=product && product.genre==='Homme' ? 'selected' : '' %>>Homme
+                                </option>
+                                <option value="Femme" <%=product && product.genre==='Femme' ? 'selected' : '' %>>Femme
+                                </option>
+                                <option value="Mixte" <%=product && product.genre==='Mixte' ? 'selected' : '' %>>Mixte
+                                </option>
+                                <option value="Maison" <%=product && product.genre==='Maison' ? 'selected' : '' %>
+                                    >Maison</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="categoriesTexte">Catégories</label>
+                            <input type="text" id="categoriesTexte" name="categoriesTexte"
+                                placeholder="Ex: Boisé, Édition limitée, Coffret"
+                                value="<%= product && product.Categories ? product.Categories.map(c => c.nom).join(', ') : '' %>">
+                            <small>Sépare les catégories par des virgules — elles seront créées automatiquement si elles
+                                n'existent pas encore.</small>
+                        </div>
+
+                    </div>
+                </details>
+
+                <details class="admin-form-section">
+                    <summary class="admin-form-section-toggle">
+                        <i class="fa-solid fa-align-left"></i> Description &amp; notes olfactives
+                    </summary>
+                    <div class="admin-form-section-body">
+
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description"
+                                rows="4"><%= product ? product.description : '' %></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="notes_tete">Notes de tête</label>
+                                <input type="text" id="notes_tete" name="notes_tete"
+                                    value="<%= product ? product.notes_tete : '' %>" placeholder="Bergamote, Citron...">
+                            </div>
+                            <div class="form-group">
+                                <label for="notes_coeur">Notes de cœur</label>
+                                <input type="text" id="notes_coeur" name="notes_coeur"
+                                    value="<%= product ? product.notes_coeur : '' %>" placeholder="Jasmin, Rose...">
+                            </div>
+                            <div class="form-group">
+                                <label for="notes_fond">Notes de fond</label>
+                                <input type="text" id="notes_fond" name="notes_fond"
+                                    value="<%= product ? product.notes_fond : '' %>" placeholder="Musc, Vanille...">
+                            </div>
+                        </div>
+
+                    </div>
+                </details>
+
+                <details class="admin-form-section">
+                    <summary class="admin-form-section-toggle">
+                        <i class="fa-solid fa-image"></i> Image du parfum
+                    </summary>
+                    <div class="admin-form-section-body">
+
+                        <div class="form-group">
+                            <label for="image">Image du parfum</label>
+                            <input type="file" id="image" name="image" accept="image/*">
+                            <% if (product && product.image_principale) { %>
+                                <div class="current-image">
+                                    <p>Image actuelle :</p>
+                                    <img src="<%= product.image_principale %>" alt="<%= product.nom %>"
+                                        class="thumb-preview">
+                                </div>
+                                <% } %>
+                        </div>
+
+                    </div>
+                </details>
+
+                <details class="admin-form-section" open>
+                    <summary class="admin-form-section-toggle">
+                        <i class="fa-solid fa-flask"></i> Variantes (contenances)
+                    </summary>
+                    <div class="admin-form-section-body">
+
+                        <p><small>Ajoute une ligne par contenance disponible (ex: 30ml, 50ml, 100ml).</small></p>
+
+                        <div id="variants-container">
+                            <% const variants=product && product.variants ? product.variants : [{}];
+                                variants.forEach(function(v) { %>
+                                <div class="variant-row">
+                                    <input type="number" name="contenance_ml" placeholder="Contenance (ml)"
+                                        value="<%= v.contenance_ml || '' %>" min="1">
+                                    <input type="number" name="prix" placeholder="Prix (FCFA)"
+                                        value="<%= v.prix || '' %>" step="0.01" min="0">
+                                    <input type="number" name="prix_promo" placeholder="Prix promo (optionnel)"
+                                        value="<%= v.prix_promo || '' %>" step="0.01" min="0">
+                                    <input type="number" name="stock" placeholder="Stock"
+                                        value="<%= v.stock !== undefined ? v.stock : '' %>" min="0">
+                                </div>
+                                <% }); %>
+                        </div>
+
+                        <button type="button" id="addVariantBtn" class="btn-secondary">+ Ajouter une contenance</button>
+
+                    </div>
+                </details>
+
+                <% if (product) { %>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="actif" <%=product.actif ? 'checked' : '' %>>
+                            Produit actif (visible en boutique)
+                        </label>
+                    </div>
+                    <% } %>
+
+                        <button type="submit" class="btn-primary admin-form-submit-desktop" style="margin-top: 20px;">
+                            <%= product ? 'Enregistrer les modifications' : 'Ajouter le parfum' %>
+                        </button>
+            </form>
+</div>
+
+<div class="sticky-cart-bar admin-sticky-submit" id="adminStickySubmit">
+    <span class="sticky-cart-name">
+        <%= product ? 'Modification en cours' : 'Nouveau parfum' %>
+    </span>
+    <button type="submit" form="productForm" class="btn-primary sticky-cta-btn">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <%= product ? 'Enregistrer' : 'Ajouter' %>
+    </button>
+</div>
+
+<script>
+    document.getElementById('addVariantBtn').addEventListener('click', function () {
+        const container = document.getElementById('variants-container');
+        const row = document.createElement('div');
+        row.className = 'variant-row';
+        row.innerHTML = `
+      <input type="number" name="contenance_ml" placeholder="Contenance (ml)" min="1">
+      <input type="number" name="prix" placeholder="Prix (FCFA)" step="0.01" min="0">
+      <input type="number" name="prix_promo" placeholder="Prix promo (optionnel)" step="0.01" min="0">
+      <input type="number" name="stock" placeholder="Stock" min="0">
+    `;
+        container.appendChild(row);
+    });
+</script>

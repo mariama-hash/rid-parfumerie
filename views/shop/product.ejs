@@ -1,0 +1,320 @@
+<div class="product-detail-container">
+
+    <nav class="breadcrumb">
+        <a href="/produits">Produits</a> / <span>
+            <%= product.nom %>
+        </span>
+    </nav>
+
+    <div class="product-detail-layout">
+
+        <div class="product-detail-image">
+            <% if (product.image_principale) { %>
+                <button type="button" class="zoomable-image-btn" id="zoomImageBtn" aria-label="Agrandir l'image">
+                    <img src="<%= product.image_principale %>" alt="<%= product.nom %>">
+                    <span class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+                </button>
+                <% } else { %>
+                    <div class="no-image-large">Pas d'image disponible</div>
+                    <% } %>
+        </div>
+
+        <div class="product-detail-info">
+            <span class="product-brand">
+                <%= product.Brand ? product.Brand.nom : '' %>
+            </span>
+            <h1>
+                <%= product.nom %>
+            </h1>
+            <span class="product-genre-badge">
+                <%= product.genre %>
+            </span>
+
+            <% if (product.description) { %>
+                <p class="product-description">
+                    <%= product.description %>
+                </p>
+                <% } %>
+
+                    <% if (product.notes_tete || product.notes_coeur || product.notes_fond) { %>
+                        <div class="olfactive-notes">
+                            <h3>Pyramide olfactive</h3>
+                            <% if (product.notes_tete) { %>
+                                <p><strong>Tête :</strong>
+                                    <%= product.notes_tete %>
+                                </p>
+                                <% } %>
+                                    <% if (product.notes_coeur) { %>
+                                        <p><strong>Cœur :</strong>
+                                            <%= product.notes_coeur %>
+                                        </p>
+                                        <% } %>
+                                            <% if (product.notes_fond) { %>
+                                                <p><strong>Fond :</strong>
+                                                    <%= product.notes_fond %>
+                                                </p>
+                                                <% } %>
+                        </div>
+                        <% } %>
+
+                            <% if (variantsWithPrix && variantsWithPrix.length> 0) { %>
+                                <form action="/panier/ajouter" method="POST" class="add-to-cart-form"
+                                    id="addToCartForm">
+                                    <input type="hidden" name="productId" value="<%= product.id %>">
+
+                                    <div class="variant-selector">
+                                        <label>Choisir la contenance :</label>
+                                        <% variantsWithPrix.forEach(function(v) { %>
+                                            <label class="variant-option <%= v.stock <= 0 ? 'disabled' : '' %>">
+                                                <input type="radio" name="variantId" value="<%= v.id %>" <%=v.stock <=0
+                                                    ? 'disabled' : '' %> required>
+                                                <%= v.contenance_ml %>ml —
+                                                    <% if (v.reduction> 0) { %>
+                                                        <span class="price-old">
+                                                            <%= parseFloat(v.prix).toLocaleString('fr-FR') %> FCFA
+                                                        </span>
+                                                        <span class="price-promo">
+                                                            <%= v.prixEffectif.toLocaleString('fr-FR') %> FCFA
+                                                        </span>
+                                                        <span class="mini-badge-promo">-<%= v.reduction %>%</span>
+                                                        <% } else { %>
+                                                            <%= parseFloat(v.prix).toLocaleString('fr-FR') %> FCFA
+                                                                <% } %>
+                                                                    <%= v.stock <=0 ? '(rupture)' : '' %>
+                                            </label>
+                                            <% }); %>
+                                    </div>
+
+                                    <div class="quantity-selector">
+                                        <label for="quantite">Quantité :</label>
+                                        <div class="quantity-stepper" id="productQtyStepper">
+                                            <button type="button" class="qty-btn qty-minus">−</button>
+                                            <input type="number" id="quantite" name="quantite" value="1" min="1"
+                                                readonly>
+                                            <button type="button" class="qty-btn qty-plus">+</button>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn-primary btn-large">Ajouter au panier</button>
+                                </form>
+                                <% } else { %>
+                                    <p class="no-variants">Ce produit n'est pas disponible à la vente pour le moment.
+                                    </p>
+                                    <% } %>
+        </div>
+    </div>
+
+    <% if (similar.length> 0) { %>
+        <section class="similar-products">
+            <h2>Vous aimerez aussi</h2>
+            <div class="products-grid">
+                <% similar.forEach(function(p) { const prices=p.variants.map(v=> parseFloat(v.prix));
+                    const prixMin = prices.length > 0 ? Math.min(...prices) : null;
+                    %>
+                    <div class="product-card">
+                        <a href="/produits/<%= p.slug %>">
+                            <div class="product-image">
+                                <% if (p.image_principale) { %>
+                                    <img src="<%= p.image_principale %>" alt="<%= p.nom %>">
+                                    <% } %>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">
+                                    <%= p.nom %>
+                                </h3>
+                                <p class="product-price">
+                                    <% if (prixMin !==null) { %>À partir de <%= prixMin.toLocaleString('fr-FR') %> FCFA
+                                            <% } %>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                    <% }); %>
+            </div>
+        </section>
+        <section class="reviews-section" id="avis">
+            <div class="section-heading">
+                <h2>Avis clients</h2>
+            </div>
+
+            <div class="review-summary">
+                <div class="review-average">
+                    <span class="review-average-number">
+                        <%= avgRating.toFixed(1) %>
+                    </span>
+                    <div class="stars">
+                        <% for (let i=1; i <=5; i++) { %>
+                            <i class="fa-<%= i <= Math.round(avgRating) ? 'solid' : 'regular' %> fa-star"></i>
+                            <% } %>
+                    </div>
+                    <span class="review-count">
+                        <%= reviewsCount %> avis
+                    </span>
+                </div>
+            </div>
+
+            <% if (user) { %>
+                <form action="/avis" method="POST" class="review-form">
+                    <input type="hidden" name="productId" value="<%= product.id %>">
+                    <h3>
+                        <%= userReview ? 'Modifier mon avis' : 'Laisser un avis' %>
+                    </h3>
+
+                    <div class="form-group">
+                        <label>Ta note</label>
+                        <div class="star-input">
+                            <% for (let i=5; i>= 1; i--) { %>
+                                <input type="radio" name="note" value="<%= i %>" id="star<%= i %>" <%=userReview &&
+                                    userReview.note===i ? 'checked' : '' %> required>
+                                <label for="star<%= i %>"><i class="fa-solid fa-star"></i></label>
+                                <% } %>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="commentaire">Commentaire (optionnel)</label>
+                        <textarea id="commentaire" name="commentaire" rows="3"
+                            placeholder="Qu'as-tu pensé de ce parfum ?"><%= userReview ? userReview.commentaire : '' %></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <%= userReview ? 'Mettre à jour' : 'Publier mon avis' %>
+                    </button>
+                </form>
+                <% } else { %>
+                    <p class="review-login-prompt">
+                        <a href="/connexion">Connecte-toi</a> pour laisser un avis sur ce parfum.
+                    </p>
+                    <% } %>
+
+                        <div class="review-list">
+                            <% if (product.reviews.length===0) { %>
+                                <p class="no-reviews">Aucun avis pour l'instant. Sois la première à donner ton avis !
+                                </p>
+                                <% } else { %>
+                                    <% product.reviews.forEach(function(review) { %>
+                                        <div class="review-item">
+                                            <div class="review-item-header">
+                                                <div class="stars">
+                                                    <% for (let i=1; i <=5; i++) { %>
+                                                        <i
+                                                            class="fa-<%= i <= review.note ? 'solid' : 'regular' %> fa-star"></i>
+                                                        <% } %>
+                                                </div>
+                                                <span class="review-author">
+                                                    <%= review.User.prenom %>
+                                                </span>
+                                                <span class="review-date">
+                                                    <%= new Date(review.createdAt).toLocaleDateString('fr-FR') %>
+                                                </span>
+                                            </div>
+                                            <% if (review.commentaire) { %>
+                                                <p class="review-comment">
+                                                    <%= review.commentaire %>
+                                                </p>
+                                                <% } %>
+                                                    <% if (user && review.userId===user.id) { %>
+                                                        <form action="/avis/<%= review.id %>/supprimer" method="POST"
+                                                            onsubmit="return confirm('Supprimer ton avis ?');">
+                                                            <button type="submit"
+                                                                class="review-delete">Supprimer</button>
+                                                        </form>
+                                                        <% } %>
+                                        </div>
+                                        <% }); %>
+                                            <% } %>
+                        </div>
+        </section>
+        <% } %>
+
+            <% if (product.image_principale) { %>
+                <div class="lightbox-overlay" id="lightboxOverlay">
+                    <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Fermer">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <img src="<%= product.image_principale %>" alt="<%= product.nom %>" loading="lazy">
+                </div>
+                <% } %>
+
+                    <% if (variantsWithPrix && variantsWithPrix.length> 0) { %>
+                        <div class="sticky-cart-bar" id="stickyCartBar">
+                            <div class="sticky-cart-info">
+                                <span class="sticky-cart-name">
+                                    <%= product.nom %>
+                                </span>
+                                <span class="sticky-cart-price" id="stickyPrice">Choisis une contenance</span>
+                            </div>
+                            <button type="submit" form="addToCartForm" class="btn-primary sticky-cta-btn">
+                                <i class="fa-solid fa-cart-plus"></i> Ajouter
+                            </button>
+                        </div>
+                        <% } %>
+</div>
+
+<script>
+    (function () {
+        const stepper = document.getElementById('productQtyStepper');
+        if (!stepper) return;
+        const input = stepper.querySelector('input');
+        stepper.querySelector('.qty-minus').addEventListener('click', function () {
+            const v = parseInt(input.value);
+            if (v > 1) input.value = v - 1;
+        });
+        stepper.querySelector('.qty-plus').addEventListener('click', function () {
+            input.value = parseInt(input.value) + 1;
+        });
+    })();
+
+    // --- Lightbox image ---
+    (function () {
+        const zoomBtn = document.getElementById('zoomImageBtn');
+        const overlay = document.getElementById('lightboxOverlay');
+        const closeBtn = document.getElementById('lightboxClose');
+        if (!zoomBtn || !overlay) return;
+
+        zoomBtn.addEventListener('click', function () {
+            overlay.classList.add('lightbox-active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        function closeLightbox() {
+            overlay.classList.remove('lightbox-active');
+            document.body.style.overflow = '';
+        }
+
+        closeBtn.addEventListener('click', closeLightbox);
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) closeLightbox();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    })();
+
+    // --- Barre sticky : affiche le prix de la variante choisie ---
+    (function () {
+        const stickyBar = document.getElementById('stickyCartBar');
+        const stickyPrice = document.getElementById('stickyPrice');
+        if (!stickyBar || !stickyPrice) return;
+
+        const radios = document.querySelectorAll('.variant-option input[type="radio"]');
+        radios.forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                const label = radio.closest('.variant-option');
+                const text = label.textContent.trim().replace(/\s+/g, ' ');
+                stickyPrice.textContent = text;
+            });
+        });
+
+        // Affiche/masque la barre selon le scroll (apparaît après avoir dépassé le formulaire principal)
+        const form = document.getElementById('addToCartForm');
+        if (form) {
+            const observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    stickyBar.classList.toggle('sticky-cart-visible', !entry.isIntersecting);
+                });
+            }, { threshold: 0 });
+            observer.observe(form);
+        }
+    })();
+</script>

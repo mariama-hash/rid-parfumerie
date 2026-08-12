@@ -1,0 +1,164 @@
+<div class="catalog-container">
+    <h1>
+        <%= title %>
+    </h1>
+
+    <div class="catalog-layout">
+
+        <!-- Sidebar filtres -->
+        <details class="filters-sidebar" id="filtersDetails" open>
+            <summary class="filters-toggle">
+                <i class="fa-solid fa-sliders"></i> Filtres
+                <span class="filters-count-badge">
+                    <%= products.length %>
+                </span>
+            </summary>
+            <div class="filters-content">
+
+                <form action="/produits" method="GET" class="search-form">
+                    <input type="text" name="search" placeholder="Rechercher un parfum..."
+                        value="<%= filters.search || '' %>">
+                    <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </form>
+
+                <div class="filter-group">
+                    <h3>Genre</h3>
+                    <ul>
+                        <li>
+                            <a href="/produits<%= filters.brand ? '?brand=' + filters.brand : '' %>"
+                                class="<%= !filters.genre ? 'active' : '' %>">
+                                Tous
+                            </a>
+                        </li>
+                        <% ['Homme', 'Femme' , 'Mixte' , 'Maison' ].forEach(function(g) { %>
+                            <li>
+                                <a href="/produits?genre=<%= g %>" class="<%= filters.genre === g ? 'active' : '' %>">
+                                    <%= g %> (<%= genreCounts[g] %>)
+                                </a>
+                            </li>
+                            <% }); %>
+                    </ul>
+                </div>
+
+                <div class="filter-group">
+                    <h3>Marques</h3>
+                    <ul>
+                        <% Object.keys(brandCounts).forEach(function(id) { %>
+                            <li>
+                                <a href="/produits?brand=<%= id %>" class="<%= filters.brand == id ? 'active' : '' %>">
+                                    <%= brandCounts[id].nom %> (<%= brandCounts[id].count %>)
+                                </a>
+                            </li>
+                            <% }); %>
+                    </ul>
+                </div>
+
+                <% if (Object.keys(categoryCounts).length> 0) { %>
+                    <div class="filter-group">
+                        <h3>Catégories</h3>
+                        <ul>
+                            <% Object.keys(categoryCounts).forEach(function(id) { %>
+                                <li>
+                                    <a href="/produits?category=<%= id %>"
+                                        class="<%= filters.category == id ? 'active' : '' %>">
+                                        <%= categoryCounts[id].nom %> (<%= categoryCounts[id].count %>)
+                                    </a>
+                                </li>
+                                <% }); %>
+                        </ul>
+                    </div>
+                    <% } %>
+
+                        <% if (filters.genre || filters.brand || filters.category || filters.search) { %>
+                            <a href="/produits" class="reset-filters"><i class="fa-solid fa-xmark"></i> Réinitialiser
+                                les filtres</a>
+                            <% } %>
+
+            </div>
+        </details>
+        <!-- Grille produits -->
+        <main class="products-main">
+
+            <div class="catalog-toolbar">
+                <span>
+                    <%= products.length %> parfum<%= products.length> 1 ? 's' : '' %>
+                </span>
+                <form action="/produits" method="GET" class="sort-form">
+                    <% ['genre', 'brand' , 'category' , 'search' ].forEach(function(key) { %>
+                        <% if (filters[key]) { %>
+                            <input type="hidden" name="<%= key %>" value="<%= filters[key] %>">
+                            <% } %>
+                                <% }); %>
+                                    <select name="sort" onchange="this.form.submit()">
+                                        <option value="">Trier par</option>
+                                        <option value="nom" <%=filters.sort==='nom' ? 'selected' : '' %>>Nom (A-Z)
+                                        </option>
+                                        <option value="prix_asc" <%=filters.sort==='prix_asc' ? 'selected' : '' %>>Prix
+                                            croissant</option>
+                                        <option value="prix_desc" <%=filters.sort==='prix_desc' ? 'selected' : '' %>
+                                            >Prix décroissant</option>
+                                    </select>
+                </form>
+            </div>
+
+            <% if (products.length===0) { %>
+                <p class="no-products">Aucun parfum ne correspond à ta recherche.</p>
+                <% } else { %>
+                    <div class="products-grid">
+                        <% products.forEach(function(product) { %>
+                            <div class="product-card">
+                                <a href="/produits/<%= product.slug %>">
+                                    <div class="product-image">
+                                        <% if (product.image_principale) { %>
+                                            <img src="<%= product.image_principale %>" alt="<%= product.nom %>"
+                                                loading="lazy">
+                                            <% } else { %>
+                                                <div class="no-image">Pas d'image</div>
+                                                <% } %>
+                                                    <% if (product.meilleureReduc> 0) { %>
+                                                        <span class="badge-promo">-<%= product.meilleureReduc %>%</span>
+                                                        <% } else if (product.estNouveau) { %>
+                                                            <span class="badge-new">Nouveau</span>
+                                                            <% } %>
+                                                                <% if (!product.enStock) { %>
+                                                                    <span class="badge-out">Rupture de stock</span>
+                                                                    <% } %>
+                                    </div>
+                                    <div class="product-info">
+                                        <span class="product-brand">
+                                            <%= product.Brand ? product.Brand.nom : '' %>
+                                        </span>
+                                        <h3 class="product-name">
+                                            <%= product.nom %>
+                                        </h3>
+                                        <span class="product-genre">
+                                            <%= product.genre %>
+                                        </span>
+                                        <p class="product-price">
+                                            <% if (product.prixMin !==null) { %>
+                                                À partir de <%= product.prixMin.toLocaleString('fr-FR') %> FCFA
+                                                    <% } else { %>
+                                                        Prix indisponible
+                                                        <% } %>
+                                        </p>
+                                    </div>
+                                </a>
+                                <a href="/produits/<%= product.slug %>" class="btn-primary btn-full">Voir le produit</a>
+                            </div>
+                            <% }); %>
+                    </div>
+                    <% } %>
+
+        </main>
+    </div>
+</div>
+<script>
+    (function () {
+        const details = document.getElementById('filtersDetails');
+        if (!details) return;
+        // Sur mobile, on referme les filtres par défaut pour laisser voir directement le compteur + les produits
+        if (window.innerWidth < 768) {
+            details.removeAttribute('open');
+        }
+    })();
+</script>

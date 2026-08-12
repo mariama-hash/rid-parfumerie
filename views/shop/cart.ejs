@@ -1,0 +1,108 @@
+<div class="cart-container">
+    <h1>Mon panier</h1>
+
+    <% if (items.length===0) { %>
+        <p class="empty-cart">Ton panier est vide pour l'instant.</p>
+        <a href="/produits" class="btn-primary">Découvrir nos parfums</a>
+        <% } else { %>
+
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th>Contenance</th>
+                        <th>Prix unitaire</th>
+                        <th>Quantité</th>
+                        <th>Sous-total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% items.forEach(function(item) { %>
+                        <tr>
+                            <td class="cart-product">
+                                <% if (item.ProductVariant.Product.image_principale) { %>
+                                    <img src="<%= item.ProductVariant.Product.image_principale %>"
+                                        alt="<%= item.ProductVariant.Product.nom %>" class="cart-thumb">
+                                    <% } %>
+                                        <div>
+                                            <span class="cart-brand">
+                                                <%= item.ProductVariant.Product.Brand ?
+                                                    item.ProductVariant.Product.Brand.nom : '' %>
+                                            </span>
+                                            <strong>
+                                                <%= item.ProductVariant.Product.nom %>
+                                            </strong>
+                                        </div>
+                            </td>
+                            <td data-label="Contenance">
+                                <%= item.ProductVariant.contenance_ml %>ml
+                            </td>
+                            <td data-label="Prix unitaire">
+                                <% if (parseFloat(item.ProductVariant.prix) !==item.prixUnitaire) { %>
+                                    <span class="price-old">
+                                        <%= parseFloat(item.ProductVariant.prix).toLocaleString('fr-FR') %> FCFA
+                                    </span><br>
+                                    <% } %>
+                                        <%= item.prixUnitaire.toLocaleString('fr-FR') %> FCFA
+                            </td>
+                            <td data-label="Quantité">
+                                <form action="/panier/<%= item.id %>/quantite" method="POST"
+                                    class="quantity-form quantity-stepper">
+                                    <button type="button" class="qty-btn qty-minus" aria-label="Diminuer">−</button>
+                                    <input type="number" name="quantite" value="<%= item.quantite %>" min="1"
+                                        max="<%= item.ProductVariant.stock %>" readonly>
+                                    <button type="button" class="qty-btn qty-plus" aria-label="Augmenter"
+                                        data-max="<%= item.ProductVariant.stock %>">+</button>
+                                </form>
+                            </td>
+                            <td data-label="Sous-total">
+                                <%= item.sousTotal.toLocaleString('fr-FR') %> FCFA
+                            </td>
+                            <td>
+                                <form action="/panier/<%= item.id %>/supprimer" method="POST"
+                                    onsubmit="return confirm('Retirer cet article ?');">
+                                    <button type="submit" class="btn-danger-small"><i
+                                            class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+
+            <div class="cart-summary">
+                <p class="cart-total">Total : <strong>
+                        <%= total.toLocaleString('fr-FR') %> FCFA
+                    </strong></p>
+                <a href="/produits" class="btn-secondary">Continuer mes achats</a>
+                <a href="/commande" class="btn-primary btn-large">Passer la commande</a>
+            </div>
+
+            <% } %>
+</div>
+
+<script>
+  document.querySelectorAll('.quantity-stepper').forEach(function(form) {
+    const input = form.querySelector('input[name="quantite"]');
+    const minusBtn = form.querySelector('.qty-minus');
+    const plusBtn = form.querySelector('.qty-plus');
+    const max = parseInt(plusBtn.dataset.max);
+
+    minusBtn.addEventListener('click', function() {
+      const current = parseInt(input.value);
+      if (current > 1) {
+        input.value = current - 1;
+        form.submit();
+      }
+    });
+
+    plusBtn.addEventListener('click', function() {
+      const current = parseInt(input.value);
+      if (current < max) {
+        input.value = current + 1;
+        form.submit();
+      }
+    });
+  });
+</script>

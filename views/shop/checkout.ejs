@@ -1,0 +1,257 @@
+<div class="checkout-container">
+    <h1>Finaliser ta commande</h1>
+
+    <% if (errors.length> 0) { %>
+        <div class="alert alert-error">
+            <ul>
+                <% errors.forEach(function(e) { %>
+                    <li>
+                        <%= e.msg %>
+                    </li>
+                    <% }); %>
+            </ul>
+        </div>
+        <% } %>
+
+            <!-- Indicateur de progression -->
+            <div class="checkout-progress" id="checkoutProgress">
+                <div class="checkout-progress-step active" data-step-indicator="1">
+                    <span class="checkout-progress-circle">1</span>
+                    <span class="checkout-progress-label">Livraison</span>
+                </div>
+                <div class="checkout-progress-line"></div>
+                <div class="checkout-progress-step" data-step-indicator="2">
+                    <span class="checkout-progress-circle">2</span>
+                    <span class="checkout-progress-label">Paiement</span>
+                </div>
+            </div>
+
+            <div class="checkout-layout">
+
+                <form action="/commande" method="POST" enctype="multipart/form-data" class="checkout-form"
+                    id="checkoutForm">
+
+                    <!-- ===== ÉTAPE 1 : LIVRAISON ===== -->
+                    <div class="checkout-step" id="checkoutStep1" data-step="1">
+
+                        <h2>Livraison</h2>
+
+                        <div class="form-group">
+                            <label for="adresse_livraison">Adresse de livraison</label>
+                            <input type="text" id="adresse_livraison" name="adresse_livraison"
+                                placeholder="Quartier, rue, repère..." value="<%= user.adresse || '' %>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ville_livraison">Ville</label>
+                            <input type="text" id="ville_livraison" name="ville_livraison"
+                                value="<%= user.ville || '' %>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telephone_contact">Téléphone (pour te joindre à la livraison)</label>
+                            <input type="tel" id="telephone_contact" name="telephone_contact"
+                                placeholder="Ex: 90 00 00 00" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes">Notes (optionnel)</label>
+                            <textarea id="notes" name="notes" rows="2"
+                                placeholder="Instructions particulières pour la livraison..."></textarea>
+                        </div>
+
+                        <button type="button" class="btn-primary btn-large" id="nextStepBtn">
+                            Continuer vers le paiement <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- ===== ÉTAPE 2 : PAIEMENT ===== -->
+                    <div class="checkout-step" id="checkoutStep2" data-step="2" style="display:none;">
+
+                        <button type="button" class="checkout-back-btn" id="backStepBtn">
+                            <i class="fa-solid fa-arrow-left"></i> Retour à la livraison
+                        </button>
+
+                        <h2>Mode de paiement</h2>
+
+                        <div class="payment-methods">
+
+                            <label class="payment-option">
+                                <input type="radio" name="mode_paiement" value="flooz" required
+                                    onclick="togglePaymentDetails('flooz')">
+                                <span>Flooz</span>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="mode_paiement" value="tmoney" required
+                                    onclick="togglePaymentDetails('tmoney')">
+                                <span>T-Money</span>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="mode_paiement" value="livraison" required
+                                    onclick="togglePaymentDetails('livraison')">
+                                <span>Paiement à la livraison</span>
+                            </label>
+
+                        </div>
+
+                        <div id="flooz-details" class="payment-details" style="display:none;">
+                            <div class="payment-instructions">
+                                <p>Envoie <strong>
+                                        <%= total.toLocaleString('fr-FR') %> FCFA
+                                    </strong> via Flooz au :</p>
+                                <p class="payment-number">
+                                    <%= paymentInfo.floozNumber %> (<%= paymentInfo.floozName %>)
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <label for="numero_expediteur_flooz">Ton numéro Flooz (celui utilisé pour
+                                    l'envoi)</label>
+                                <input type="tel" id="numero_expediteur_flooz" name="numero_expediteur"
+                                    placeholder="Ex: 90 00 00 00">
+                            </div>
+                            <div class="form-group">
+                                <label for="reference_flooz">Référence de la transaction</label>
+                                <input type="text" id="reference_flooz" name="reference_transaction"
+                                    placeholder="Ex: FL240809.1234">
+                                <small>Le code donné par Flooz juste après ton envoi (dans le SMS ou l'écran de
+                                    confirmation).</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="capture_flooz">Capture d'écran de la transaction</label>
+                                <input type="file" id="capture_flooz" name="capture_ecran" accept="image/*">
+                            </div>
+                        </div>
+
+                        <div id="tmoney-details" class="payment-details" style="display:none;">
+                            <div class="payment-instructions">
+                                <p>Envoie <strong>
+                                        <%= total.toLocaleString('fr-FR') %> FCFA
+                                    </strong> via T-Money au :</p>
+                                <p class="payment-number">
+                                    <%= paymentInfo.tmoneyNumber %> (<%= paymentInfo.tmoneyName %>)
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <label for="numero_expediteur_tmoney">Ton numéro T-Money (celui utilisé pour
+                                    l'envoi)</label>
+                                <input type="tel" id="numero_expediteur_tmoney" name="numero_expediteur"
+                                    placeholder="Ex: 91 00 00 00">
+                            </div>
+                            <div class="form-group">
+                                <label for="reference_tmoney">Référence de la transaction</label>
+                                <input type="text" id="reference_tmoney" name="reference_transaction"
+                                    placeholder="Ex: TM240809.5678">
+                                <small>Le code donné par T-Money juste après ton envoi (dans le SMS ou l'écran de
+                                    confirmation).</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="capture_tmoney">Capture d'écran de la transaction</label>
+                                <input type="file" id="capture_tmoney" name="capture_ecran" accept="image/*">
+                            </div>
+                        </div>
+
+                        <div id="livraison-details" class="payment-details" style="display:none;">
+                            <p class="payment-instructions">Tu paieras en espèces à la réception de ta commande.</p>
+                        </div>
+
+                        <button type="submit" class="btn-primary btn-large">Confirmer la commande</button>
+                    </div>
+
+                </form>
+
+                <div class="checkout-summary">
+                    <h2>Récapitulatif</h2>
+                    <% items.forEach(function(item) { %>
+                        <div class="summary-item">
+                            <span>
+                                <%= item.ProductVariant.Product.nom %> (<%= item.ProductVariant.contenance_ml %>ml) ×
+                                        <%= item.quantite %>
+                            </span>
+                            <span>
+                                <%= item.sousTotal.toLocaleString('fr-FR') %> FCFA
+                            </span>
+                        </div>
+                        <% }); %>
+                            <div class="summary-total">
+                                <span>Total</span>
+                                <span>
+                                    <%= total.toLocaleString('fr-FR') %> FCFA
+                                </span>
+                            </div>
+                </div>
+
+            </div>
+</div>
+
+<script>
+    const paymentModes = ['flooz', 'tmoney', 'livraison'];
+
+    function togglePaymentDetails(mode) {
+        paymentModes.forEach(function (m) {
+            const div = document.getElementById(m + '-details');
+            div.style.display = 'none';
+            div.querySelectorAll('input, textarea').forEach(function (el) {
+                el.disabled = true;
+            });
+        });
+
+        const activeDiv = document.getElementById(mode + '-details');
+        activeDiv.style.display = 'block';
+        activeDiv.querySelectorAll('input, textarea').forEach(function (el) {
+            el.disabled = false;
+        });
+    }
+
+    // Désactive tous les champs cachés dès le chargement de la page
+    document.addEventListener('DOMContentLoaded', function () {
+        paymentModes.forEach(function (m) {
+            const div = document.getElementById(m + '-details');
+            div.querySelectorAll('input, textarea').forEach(function (el) {
+                el.disabled = true;
+            });
+        });
+    });
+
+    // ===== NAVIGATION ENTRE LES ÉTAPES =====
+    (function () {
+        const step1 = document.getElementById('checkoutStep1');
+        const step2 = document.getElementById('checkoutStep2');
+        const nextBtn = document.getElementById('nextStepBtn');
+        const backBtn = document.getElementById('backStepBtn');
+        const progressSteps = document.querySelectorAll('.checkout-progress-step');
+
+        function showStep(stepNumber) {
+            if (stepNumber === 1) {
+                step1.style.display = 'block';
+                step2.style.display = 'none';
+            } else {
+                step1.style.display = 'none';
+                step2.style.display = 'block';
+                window.scrollTo({ top: step2.offsetTop - 100, behavior: 'smooth' });
+            }
+
+            progressSteps.forEach(function (el) {
+                const isActive = parseInt(el.dataset.stepIndicator) <= stepNumber;
+                el.classList.toggle('active', isActive);
+            });
+        }
+
+        nextBtn.addEventListener('click', function () {
+            // On valide uniquement les champs de l'étape 1, pas ceux (cachés) de l'étape 2
+            const step1Fields = step1.querySelectorAll('[required]');
+            for (const field of step1Fields) {
+                if (!field.checkValidity()) {
+                    field.reportValidity();
+                    return;
+                }
+            }
+            showStep(2);
+        });
+
+        backBtn.addEventListener('click', function () {
+            showStep(1);
+        });
+    })();
+</script>

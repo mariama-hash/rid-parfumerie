@@ -1,0 +1,61 @@
+<div class="auth-container">
+  <h1>Créer un compte</h1>
+
+  <% if (errors.length > 0) { %>
+    <div class="alert alert-error">
+      <ul>
+        <% errors.forEach(function(error) { %>
+          <li><%= error.msg %></li>
+        <% }); %>
+      </ul>
+    </div>
+  <% } %>
+
+  <form action="/inscription" method="POST" class="auth-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="nom">Nom</label>
+        <input type="text" id="nom" name="nom" value="<%= old.nom || '' %>" required>
+      </div>
+      <div class="form-group">
+        <label for="prenom">Prénom</label>
+        <input type="text" id="prenom" name="prenom" value="<%= old.prenom || '' %>" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" value="<%= old.email || '' %>" required>
+    </div>
+
+    <div class="form-group">
+      <label for="telephone">Téléphone</label>
+      <input type="tel" id="telephone" name="telephone" value="<%= old.telephone || '' %>" placeholder="Ex: 90 00 00 00" required>
+    </div>
+
+    <div class="form-group">
+      <label for="adresse">Adresse</label>
+      <input type="text" id="adresse" name="adresse" value="<%= old.adresse || '' %>" placeholder="Quartier, rue..." required>
+    </div>
+
+    <div class="form-group">
+      <label for="ville">Ville</label>
+      <input type="text" id="ville" name="ville" value="<%= old.ville || '' %>" placeholder="Ex: Lomé" required>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirmer le mot de passe</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary">S'inscrire</button>
+  </form>
+
+  <p class="auth-switch">Déjà un compte ? <a href="/connexion">Se connecter</a></p>
+</div>

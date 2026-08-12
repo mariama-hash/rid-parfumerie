@@ -1,0 +1,29 @@
+<div class="confirmation-container">
+  <div class="confirmation-box">
+<h1><i class="fa-solid fa-circle-check"></i> Commande confirmée !</h1>    <p>Merci pour ta commande, elle a bien été enregistrée.</p>
+
+    <div class="order-summary">
+      <p><strong>Numéro de commande :</strong> <%= order.numero_commande %></p>
+      <p><strong>Statut :</strong> <%= order.statut %></p>
+      <p><strong>Total :</strong> <%= parseFloat(order.total).toLocaleString('fr-FR') %> FCFA</p>
+      <p><strong>Mode de paiement :</strong> <%= order.Payment.mode %></p>
+
+      <% if (order.Payment.mode === 'livraison') { %>
+<p><i class="fa-solid fa-money-bill-wave"></i> Tu paieras en espèces à la réception.</p>      <% } else { %>
+<p><i class="fa-solid fa-mobile-screen"></i> Ta preuve de paiement a été reçue, elle sera vérifiée sous peu.</p>      <% } %>
+
+      <h3>Articles commandés</h3>
+      <ul>
+        <% order.items.forEach(function(item) { %>
+          <li><%= item.ProductVariant.Product.nom %> (<%= item.ProductVariant.contenance_ml %>ml) × <%= item.quantite %> — <%= parseFloat(item.prix_unitaire * item.quantite).toLocaleString('fr-FR') %> FCFA</li>
+        <% }); %>
+      </ul>
+
+      <h3>Livraison</h3>
+      <p><%= order.adresse_livraison %>, <%= order.ville_livraison %></p>
+      <p>Contact : <%= order.telephone_contact %></p>
+    </div>
+
+    <a href="/produits" class="btn-primary">Continuer mes achats</a>
+  </div>
+</div>

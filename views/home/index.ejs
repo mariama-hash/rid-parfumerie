@@ -1,0 +1,358 @@
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-eyebrow hero-eyebrow-animated">
+            <i class="fa-solid fa-sparkles hero-eyebrow-icon"></i>
+            <span class="hero-eyebrow-text">Bienvenue chez Rid_Parfumerie</span>
+        </span>
+        <h1 class="hero-title">Trouve le parfum<br>qui te <em>ressemble</em>.</h1>
+        <p class="hero-sub">
+            Une sélection de fragrances authentiques, des notes de tête aux notes de fond,
+            livrées chez toi ou payées à la réception.
+        </p>
+        <div class="hero-actions">
+            <a href="/produits" class="btn-primary btn-large">Découvrir la collection</a>
+            <a href="/produits?genre=Femme" class="btn-secondary btn-large">Parfums Femme</a>
+        </div>
+    </div>
+
+    <% const mosaicImages=featured.filter(p=> p.image_principale).slice(0, 4); %>
+        <% if (mosaicImages.length> 0) { %>
+            <div class="hero-mosaic">
+                <% mosaicImages.forEach(function(p) { %>
+                    <img src="<%= p.image_principale %>" alt="<%= p.nom %>">
+                    <% }); %>
+            </div>
+            <% } %>
+</section>
+
+<section class="category-circles reveal">
+    <% genreShowcase.forEach(function(g) { %>
+        <a href="/produits?genre=<%= g.genre %>" class="category-circle">
+            <div class="category-circle-img <%= !g.image ? 'no-photo' : '' %>">
+                <% if (g.image) { %>
+                    <img src="<%= g.image %>" alt="<%= g.genre %>">
+                    <% } else { %>
+                        <i class="fa-solid fa-flask"></i>
+                        <% } %>
+            </div>
+            <span>
+                <%= g.genre %>
+            </span>
+        </a>
+        <% }); %>
+            <a href="/produits" class="category-circle">
+                <div class="category-circle-img no-photo">
+                    <i class="fa-solid fa-border-all"></i>
+                </div>
+                <span>Tout voir</span>
+            </a>
+</section>
+
+<section class="promo-marquee reveal">
+    <div class="marquee-track">
+        <span class="marquee-slogan">L'élégance se respire, elle ne s'explique pas</span>
+        <span><i class="fa-solid fa-location-dot"></i>
+            <%= contact.address %>
+        </span>
+        <% if (contact.whatsapp) { %>
+            <span><i class="fa-brands fa-whatsapp"></i>
+                <%= contact.phoneDisplay %>
+            </span>
+            <% } %>
+                <span><i class="fa-solid fa-mobile-screen"></i> Flooz &amp; T-Money acceptés</span>
+                <span><i class="fa-solid fa-truck"></i> Livraison à Lomé</span>
+                <span><i class="fa-solid fa-flask"></i> Fragrances 100% authentiques</span>
+                <!-- Dupliqué pour un défilement continu sans coupure -->
+                <span class="marquee-slogan">L'élégance se respire, elle ne s'explique pas</span>
+                <span><i class="fa-solid fa-location-dot"></i>
+                    <%= contact.address %>
+                </span>
+                <% if (contact.whatsapp) { %>
+                    <span><i class="fa-brands fa-whatsapp"></i>
+                        <%= contact.phoneDisplay %>
+                    </span>
+                    <% } %>
+                        <span><i class="fa-solid fa-mobile-screen"></i> Flooz &amp; T-Money acceptés</span>
+                        <span><i class="fa-solid fa-truck"></i> Livraison à Lomé</span>
+                        <span><i class="fa-solid fa-flask"></i> Fragrances 100% authentiques</span>
+    </div>
+</section>
+
+<section class="featured-section reveal">
+    <div class="section-heading">
+        <h2>Nos dernières arrivées</h2>
+        <a href="/produits" class="see-all">Voir tout <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <% if (featured.length===0) { %>
+        <p class="no-products">Le catalogue arrive très bientôt.</p>
+        <% } else { %>
+            <div class="products-grid">
+                <% featured.forEach(function(product) { %>
+                    <div class="product-card">
+                        <a href="/produits/<%= product.slug %>">
+                            <div class="product-image">
+                                <% if (product.image_principale) { %>
+                                    <img src="<%= product.image_principale %>" alt="<%= product.nom %>" loading="lazy">
+                                    <% } else { %>
+                                        <div class="no-image">Pas d'image</div>
+                                        <% } %>
+                                            <% if (product.meilleureReduc> 0) { %>
+                                                <span class="badge-promo">-<%= product.meilleureReduc %>%</span>
+                                                <% } else if (product.estNouveau) { %>
+                                                    <span class="badge-new">Nouveau</span>
+                                                    <% } %>
+                                                        <% if (!product.enStock) { %>
+                                                            <span class="badge-out">Rupture de stock</span>
+                                                            <% } %>
+                            </div>
+                            <div class="product-info">
+                                <span class="product-brand">
+                                    <%= product.Brand ? product.Brand.nom : '' %>
+                                </span>
+                                <h3 class="product-name">
+                                    <%= product.nom %>
+                                </h3>
+                                <span class="product-genre">
+                                    <%= product.genre %>
+                                </span>
+                                <p class="product-price">
+                                    <% if (product.prixMin !==null) { %>
+                                        À partir de <%= product.prixMin.toLocaleString('fr-FR') %> FCFA
+                                            <% } else { %>
+                                                Prix indisponible
+                                                <% } %>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                    <% }); %>
+            </div>
+            <% } %>
+</section>
+
+<% if (topReviews.length> 0) { %>
+    <section class="testimonials-section reveal">
+        <div class="section-heading">
+            <h2>Elles nous font confiance</h2>
+        </div>
+        <div class="testimonials-track">
+            <% [...topReviews, ...topReviews].forEach(function(review) { %>
+                <div class="testimonial-card">
+                    <div class="stars">
+                        <% for (let i=1; i <=5; i++) { %>
+                            <i class="fa-<%= i <= review.note ? 'solid' : 'regular' %> fa-star"></i>
+                            <% } %>
+                    </div>
+                    <% if (review.commentaire) { %>
+                        <p class="testimonial-comment">"<%= review.commentaire %>"</p>
+                        <% } %>
+                            <p class="testimonial-author">
+                                <%= review.User.prenom %> — <span>
+                                        <%= review.Product.nom %>
+                                    </span>
+                            </p>
+                </div>
+                <% }); %>
+        </div>
+
+        <script>
+            (function () {
+                const testimonialsTrack = document.querySelector('.testimonials-track');
+                if (!testimonialsTrack) return;
+
+                // Le CSS gère déjà la pause au survol souris (:hover)
+                // On ajoute ici la pause au tap tactile
+                let isPaused = false;
+
+                testimonialsTrack.addEventListener('touchstart', function () {
+                    isPaused = true;
+                    testimonialsTrack.style.animationPlayState = 'paused';
+                }, { passive: true });
+
+                // Relance le défilement 4 secondes après le dernier tap, pour laisser le temps de lire
+                let resumeTimer;
+                testimonialsTrack.addEventListener('touchstart', function () {
+                    clearTimeout(resumeTimer);
+                    resumeTimer = setTimeout(function () {
+                        testimonialsTrack.style.animationPlayState = 'running';
+                        isPaused = false;
+                    }, 4000);
+                }, { passive: true });
+            })();
+        </script>
+    </section>
+    <% } %>
+
+        <% const slideCount=(social.tiktok ? 1 : 0) + (social.instagram ? 1 : 0) + (social.linkedin ? 1 : 0) +
+            (bestPromo ? 1 : 0); %>
+            <% if (slideCount> 0) { %>
+                <section class="promo-carousel-section reveal">
+                    <div class="promo-carousel" id="promoCarousel">
+                        <button class="carousel-arrow carousel-prev" id="carouselPrevBtn" aria-label="Précédent">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+
+                        <div class="carousel-viewport">
+                            <div class="carousel-track" id="carouselTrack">
+
+                                <% if (social.tiktok) { %>
+                                    <div class="carousel-slide">
+                                        <div class="carousel-text">
+                                            <span class="carousel-pill"><i class="fa-solid fa-hashtag"></i> Réseaux
+                                                sociaux</span>
+                                            <h2>Suis-nous sur <em>TikTok</em></h2>
+                                            <p>Nouveautés et coulisses en vidéo.</p>
+                                            <a href="<%= social.tiktok %>" target="_blank" rel="noopener"
+                                                class="carousel-cta">
+                                                <i class="fa-brands fa-tiktok"></i> Suivre <i
+                                                    class="fa-solid fa-arrow-right"></i>
+                                            </a>
+                                        </div>
+                                        <div class="carousel-visual"><i class="fa-brands fa-tiktok"></i></div>
+                                    </div>
+                                    <% } %>
+
+                                        <% if (social.instagram) { %>
+                                            <div class="carousel-slide">
+                                                <div class="carousel-text">
+                                                    <span class="carousel-pill"><i class="fa-solid fa-hashtag"></i>
+                                                        Réseaux sociaux</span>
+                                                    <h2>Suis-nous sur <em>Instagram</em></h2>
+                                                    <p>Photos et lancements en avant-première.</p>
+                                                    <a href="<%= social.instagram %>" target="_blank" rel="noopener"
+                                                        class="carousel-cta">
+                                                        <i class="fa-brands fa-instagram"></i> Suivre <i
+                                                            class="fa-solid fa-arrow-right"></i>
+                                                    </a>
+                                                </div>
+                                                <div class="carousel-visual"><i class="fa-brands fa-instagram"></i>
+                                                </div>
+                                            </div>
+                                            <% } %>
+
+                                                <% if (social.linkedin) { %>
+                                                    <div class="carousel-slide">
+                                                        <div class="carousel-text">
+                                                            <span class="carousel-pill"><i
+                                                                    class="fa-solid fa-hashtag"></i> Réseaux
+                                                                sociaux</span>
+                                                            <h2>Retrouve-nous sur <em>LinkedIn</em></h2>
+                                                            <p>Suis l'évolution du projet Rid_Parfumerie.</p>
+                                                            <a href="<%= social.linkedin %>" target="_blank"
+                                                                rel="noopener" class="carousel-cta">
+                                                                <i class="fa-brands fa-linkedin"></i> Suivre <i
+                                                                    class="fa-solid fa-arrow-right"></i>
+                                                            </a>
+                                                        </div>
+                                                        <div class="carousel-visual"><i
+                                                                class="fa-brands fa-linkedin"></i></div>
+                                                    </div>
+                                                    <% } %>
+
+                                                        <% if (bestPromo) { %>
+                                                            <div class="carousel-slide">
+                                                                <div class="carousel-text">
+                                                                    <span class="carousel-pill"><i
+                                                                            class="fa-solid fa-tag"></i>
+                                                                        Promotion</span>
+                                                                    <h2>Jusqu'à <em>-<%= bestPromo.discount %>%</em> de
+                                                                        réduction</h2>
+                                                                    <p>Découvre nos meilleures offres du moment.</p>
+                                                                    <a href="/produits" class="carousel-cta">
+                                                                        <i class="fa-solid fa-shopping-bag"></i> Voir
+                                                                        les produits
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                            <% } %>
+
+                            </div>
+                        </div>
+
+                        <button class="carousel-arrow carousel-next" id="carouselNextBtn" aria-label="Suivant">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+                        <div class="carousel-dots" id="carouselDots">
+                            <% for (let i=0; i < slideCount; i++) { %>
+                                <button class="carousel-dot <%= i === 0 ? 'active' : '' %>"
+                                    data-slide-index="<%= i %>"></button>
+                                <% } %>
+                        </div>
+                    </div>
+                </section>
+                <% } %>
+
+                    <script>
+                        (function () {
+                            const track = document.getElementById('carouselTrack');
+                            if (!track) return;
+
+                            const dots = document.querySelectorAll('#carouselDots .carousel-dot');
+                            const totalSlides = track.children.length;
+                            let currentIndex = 0;
+                            let autoplayTimer;
+
+                            function updateCarousel() {
+                                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                                dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
+                            }
+
+                            window.carouselMove = function (direction) {
+                                currentIndex = (currentIndex + direction + totalSlides) % totalSlides;
+                                updateCarousel();
+                                resetAutoplay();
+                            };
+
+                            window.carouselGoTo = function (index) {
+                                currentIndex = index;
+                                updateCarousel();
+                                resetAutoplay();
+                            };
+
+                            function resetAutoplay() {
+                                clearInterval(autoplayTimer);
+                                autoplayTimer = setInterval(() => window.carouselMove(1), 6000);
+                            }
+
+                            resetAutoplay();
+
+                            // --- Écouteurs des flèches et des points (remplace les onclick inline) ---
+                            const prevBtn = document.getElementById('carouselPrevBtn');
+                            const nextBtn = document.getElementById('carouselNextBtn');
+                            if (prevBtn) prevBtn.addEventListener('click', () => window.carouselMove(-1));
+                            if (nextBtn) nextBtn.addEventListener('click', () => window.carouselMove(1));
+
+                            dots.forEach(function (dot) {
+                                dot.addEventListener('click', function () {
+                                    window.carouselGoTo(parseInt(dot.dataset.slideIndex));
+                                });
+                            });
+
+                            // --- Swipe tactile ---
+                            let touchStartX = 0;
+                            let touchEndX = 0;
+                            const SWIPE_THRESHOLD = 40; // pixels minimum pour considérer que c'est un swipe
+
+                            track.addEventListener('touchstart', function (e) {
+                                touchStartX = e.touches[0].clientX;
+                                clearInterval(autoplayTimer); // pause l'autoplay pendant l'interaction
+                            }, { passive: true });
+
+                            track.addEventListener('touchend', function (e) {
+                                touchEndX = e.changedTouches[0].clientX;
+                                const diff = touchStartX - touchEndX;
+
+                                if (Math.abs(diff) > SWIPE_THRESHOLD) {
+                                    if (diff > 0) {
+                                        window.carouselMove(1); // swipe vers la gauche → slide suivant
+                                    } else {
+                                        window.carouselMove(-1); // swipe vers la droite → slide précédent
+                                    }
+                                } else {
+                                    resetAutoplay(); // pas assez de mouvement, on relance juste l'autoplay
+                                }
+                            }, { passive: true });
+                        })();
+                    </script>

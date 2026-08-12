@@ -1,0 +1,55 @@
+<div class="admin-container">
+  <div class="admin-header">
+    <h1>Clients (<%= customers.length %>)</h1>
+  </div>
+
+  <div class="admin-table-wrapper">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Email</th>
+          <th>Téléphone</th>
+          <th>Commandes</th>
+          <th>Total dépensé</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% customers.forEach(function(c) { %>
+          <tr>
+            <td><%= c.prenom %> <%= c.nom %></td>
+            <td><%= c.email %></td>
+            <td><%= c.telephone || '—' %></td>
+            <td><%= c.nbCommandes %></td>
+            <td><%= c.totalDepense.toLocaleString('fr-FR') %> FCFA</td>
+            <td>
+              <span class="status-badge <%= c.actif ? 'status-confirmee' : 'status-annulee' %>">
+                <%= c.actif ? 'Actif' : 'Désactivé' %>
+              </span>
+            </td>
+            <td>
+              <form action="/admin/clients/<%= c.id %>/toggle" method="POST" class="toggle-client-form" data-action-label="<%= c.actif ? 'Désactiver' : 'Réactiver' %>">
+                <button type="submit" class="<%= c.actif ? 'btn-danger-small' : 'btn-success' %>">
+                  <%= c.actif ? 'Désactiver' : 'Réactiver' %>
+                </button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.toggle-client-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+      const label = form.dataset.actionLabel;
+      if (!confirm(label + ' ce compte ?')) {
+        e.preventDefault();
+      }
+    });
+  });
+</script>
