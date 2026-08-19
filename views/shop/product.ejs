@@ -10,10 +10,12 @@
 
         <div class="product-detail-image">
             <% if (product.image_principale) { %>
-                <button type="button" class="zoomable-image-btn" id="zoomImageBtn" aria-label="Agrandir l'image">
+                <div class="zoomable-image-btn">
                     <img src="<%= product.image_principale %>" alt="<%= product.nom %>">
-                    <span class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
-                </button>
+                    <button type="button" class="zoom-hint" id="zoomImageBtn" aria-label="Agrandir l'image">
+                        <i class="fa-solid fa-magnifying-glass-plus"></i>
+                    </button>
+                </div>
                 <% } else { %>
                     <div class="no-image-large">Pas d'image disponible</div>
                     <% } %>
