@@ -20,6 +20,8 @@ const { getCartCount } = require('./controllers/cartController');
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 // --- Sécurité HTTP ---
 app.use(helmet({
   contentSecurityPolicy: {
