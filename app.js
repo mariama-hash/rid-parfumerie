@@ -1,3 +1,4 @@
+require('./instrument.js');
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -14,6 +15,7 @@ const homeController = require('./controllers/homeController');
 const reviewRoutes = require('./routes/reviewRoutes');
 const { sequelize } = require('./models');
 const helmet = require('helmet');
+const Sentry = require('@sentry/node');
 const accountRoutes = require('./routes/accountRoutes');
 const legalRoutes = require('./routes/legalRoutes');
 const { getCartCount } = require('./controllers/cartController');
@@ -101,6 +103,8 @@ app.use('/', reviewRoutes);
 app.use('/', accountRoutes);
 app.use('/', legalRoutes);
 
+
+
 app.get('/', homeController.show);
 // (les autres routes viendront ici : /produits, /panier, /admin, etc.)
 
@@ -108,6 +112,9 @@ app.get('/', homeController.show);
 app.use((req, res) => {
   res.status(404).send('Page non trouvée');
 });
+
+// --- Sentry : capture automatique des erreurs Express ---
+Sentry.setupExpressErrorHandler(app);
 
 // --- Gestion d'erreurs globale ---
 app.use((err, req, res, next) => {
