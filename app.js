@@ -81,6 +81,11 @@ app.use(async (req, res, next) => {
     address: process.env.CONTACT_ADDRESS,
   };
 
+    res.locals.posthog = {
+    key: process.env.POSTHOG_KEY,
+    host: process.env.POSTHOG_HOST,
+  };
+
   if (req.session.user) {
     try {
       res.locals.cartCount = await getCartCount(req.session.user.id);
